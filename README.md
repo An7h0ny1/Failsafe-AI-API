@@ -8,31 +8,36 @@ Las empresas pierden confianza y dinero cuando un LLM falla, tarda demasiado o d
 Este proyecto demuestra cómo hacer que la IA sea **confiable en producción** usando patrones enterprise de Java.
 
 ## Arquitectura
+```mermaid
+graph TD
+    %% Nodos iniciales
+    Client([Cliente HTTP]) --- Controller[TicketController]
+    Controller --> Service[TicketService]
 
-```text
-Cliente HTTP
-│
-▼
-TicketController (POST /api/v1/tickets/clasificar)
-│
-▼
-TicketService
-│
-├─── Circuit Breaker (Resilience4j) ──────────────────────┐
-│         │                                                │
-│    [CERRADO]                                        [ABIERTO]
-│         │                                                │
-▼         ▼                                                ▼
-│    ChatClient (Groq / Llama 3.3)          FallbackEngine (Determinista)
-│         │                                                │
-│    [timeout > 3s o error]                   keywords: robado, perdido...
-│         │                                                │
-└─────────┴────────────────────────────────────────────────┘
-│
-▼
-TicketResponse
-{ category, provider, status }
+    %% Bloque de Resiliencia
+    subgraph Resiliencia [Patrón Circuit Breaker - Resilience4j]
+        direction TB
+        Service --> CB{¿Estado del Circuito?}
+        
+        %% Caminos
+        CB -- "CERRADO (OK)" --> AI[ChatClient Groq / Llama 3.3]
+        CB -- "ABIERTO (FALLA)" --> Fallback[FallbackEngine Determinista]
+        
+        %% Salto por timeout o error
+        AI -.->|Error / Timeout > 3s| Fallback
+    end
+
+    %% Salida final
+    AI --> Response[/TicketResponse/]
+    Fallback --> Response
+
+    %% Estilos mejorados para contraste
+    style CB fill:#333,stroke:#fff,color:#fff
+    style AI fill:#0D47A1,stroke:#fff,color:#fff
+    style Fallback fill:#FBC02D,stroke:#000,color:#000
+    style Resiliencia fill:#f4f4f4,stroke:#333,stroke-dasharray: 5 5,color:#333
 ```
+
 ## Flujo de resiliencia
 
 | Situación | Comportamiento |
