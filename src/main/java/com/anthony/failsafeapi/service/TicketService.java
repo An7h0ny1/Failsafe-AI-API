@@ -1,5 +1,6 @@
 package com.anthony.failsafeapi.service;
 
+import com.anthony.failsafeapi.exception.AiClassificationException;
 import com.anthony.failsafeapi.model.TicketResponse;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -20,17 +21,35 @@ public class TicketService {
 
     @CircuitBreaker(name = BREAKER_INSTANCE, fallbackMethod = "fallbackClassifyTicket")
     public TicketResponse classifyTicket(String description) {
-        log.info("Calling Grok AI for description: {}", description);
+        if (description == null || description.isBlank()) {
+            throw new IllegalArgumentException("La descripción no puede estar vacía");
+        }
+
+        log.info("Clasificando ticket con Groq AI: {}", description);
         meterRegistry.counter("tickets.classification.ai.calls").increment();
 
-        return chatClient.prompt()
-                .user(description)
-                .call()
-                .entity(TicketResponse.class);
+        try {
+            TicketResponse response = chatClient.prompt()
+                    .user(description)
+                    .call()
+                    .entity(TicketResponse.class);
+
+            if (response == null || response.category() == null) {
+                throw new AiClassificationException("Respuesta inválida del LLM", null);
+            }
+
+            log.info("Clasificación exitosa: {}", response.category());
+            return response;
+
+        } catch (AiClassificationException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new AiClassificationException("Error al clasificar con LLM", ex);
+        }
     }
 
     /**
-     * Este método se ejecutará si Google Gemini:
+     * Este método se ejecutará si Grok Gemini:
      * 1. Lanza una excepción (error 500, API Key inválida, etc.)
      * 2. Tarda más de lo configurado (Timeout)
      * 3. El circuito está abierto
