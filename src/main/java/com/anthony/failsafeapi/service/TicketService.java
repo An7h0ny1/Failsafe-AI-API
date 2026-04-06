@@ -49,7 +49,7 @@ public class TicketService {
     }
 
     /**
-     * Este método se ejecutará si Grok Gemini:
+     * Este método se ejecutará si Grok:
      * 1. Lanza una excepción (error 500, API Key inválida, etc.)
      * 2. Tarda más de lo configurado (Timeout)
      * 3. El circuito está abierto

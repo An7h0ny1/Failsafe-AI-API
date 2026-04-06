@@ -1,0 +1,28 @@
+spring.application.name=failsafe-api
+
+spring.threads.virtual.enabled=true
+
+# Obtén tu API key gratis en: https://console.groq.com
+spring.ai.openai.api-key=YOUR_GROQ_API_KEY_HERE
+spring.ai.openai.base-url=https://api.groq.com/openai
+spring.ai.openai.chat.options.model=llama-3.3-70b-versatile
+spring.ai.openai.chat.options.temperature=0.0
+
+# Resilience4j - Circuit Breaker
+resilience4j.circuitbreaker.instances.aiClassification.register-health-indicator=true
+resilience4j.circuitbreaker.instances.aiClassification.failure-rate-threshold=50
+resilience4j.circuitbreaker.instances.aiClassification.wait-duration-in-open-state=10s
+resilience4j.circuitbreaker.instances.aiClassification.slow-call-duration-threshold=3s
+resilience4j.circuitbreaker.instances.aiClassification.minimum-number-of-calls=5
+resilience4j.circuitbreaker.instances.aiClassification.permitted-number-of-calls-in-half-open-state=2
+resilience4j.circuitbreaker.instances.aiClassification.sliding-window-size=10
+resilience4j.circuitbreaker.instances.aiClassification.sliding-window-type=COUNT_BASED
+resilience4j.circuitbreaker.instances.aiClassification.slow-call-rate-threshold=50
+
+# Resilience4j - TimeLimiter
+resilience4j.timelimiter.instances.aiClassification.timeout-duration=5s
+
+# Actuator y monitoreo
+management.endpoints.web.exposure.include=health,metrics,circuitbreakers
+management.endpoint.health.show-details=always
+resilience4j.circuitbreaker.metrics.enabled=true

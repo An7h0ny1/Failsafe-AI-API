@@ -87,12 +87,15 @@ Content-Type: application/json
 ## Cómo correrlo
 ```bash
 # 1. Clona el repositorio
-git clone https://github.com/tu-usuario/failsafe-api.git
+git clone https://github.com/An7h0ny1/Failsafe-AI-API.git
 
-# 2. Configura tu API key de Groq (gratis en console.groq.com)
-export GROQ_API_KEY=tu_api_key_aqui
+# 2. Copia el archivo de configuración
+cp src/main/resources/application.properties.example src/main/resources/application.properties
 
-# 3. Corre el proyecto
+# 3. Edita application.properties y reemplaza YOUR_GROQ_API_KEY_HERE
+# Obtén tu API key gratis en: https://console.groq.com
+
+# 4. Corre el proyecto
 ./mvnw spring-boot:run
 ```
 
