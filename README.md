@@ -53,7 +53,7 @@ graph TD
 | Tecnología | Versión | Propósito |
 |---|---|---|
 | Java | 21 | Virtual Threads para concurrencia eficiente |
-| Spring Boot | 3.3+ | Framework base |
+| Spring Boot | 3.5 | Framework base |
 | Spring AI | 1.0+ | Abstracción sobre LLMs |
 | Groq + Llama 3.3 | 70b | Inferencia rápida |
 | Resilience4j | 2.x | Circuit Breaker + TimeLimiter |
